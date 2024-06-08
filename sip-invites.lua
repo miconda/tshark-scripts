@@ -41,28 +41,31 @@ do
 				sipcalls[sip_call_id]["REPLY_DST"] = dst_addr
 			end
 		end
-		function print_r (t, indent, done)
-			done = done or {}
-			indent = indent or ''
-			local nextIndent -- Storage for next indentation value
-			for key, value in pairs (t) do
-				if type (value) == "table" and not done [value] then
-					nextIndent = nextIndent or
-					(indent .. string.rep(' ',string.len(tostring (key))+2))
-					-- Shortcut conditional allocation
-					done [value] = true
-					print (indent .. "[" .. tostring (key) .. "] => Table {");
-					print  (nextIndent .. "{");
-					print_r (value, nextIndent .. string.rep(' ',2), done)
-					print  (nextIndent .. "}");
-				else
-					print  (indent .. "[" .. tostring (key) .. "] => " .. tostring (value).."")
+		function print_j(tbl, indent)
+			indent = indent or '    '
+			io.write("{\n")
+			local l = 0
+			for k, v in pairs(tbl) do
+				if l == 1 then
+					io.write(",\n")
 				end
+				io.write(indent .. "\"" .. k .. "\": ")
+				if type(v) == "table" then
+					print_j(v, indent .. '    ')
+				else
+					if type(v) == "number" then
+						io.write(tostring(v))
+					else
+						io.write("\"" .. tostring(v) .. "\"")
+					end
+				end
+				l = 1
 			end
+			io.write("\n" .. string.sub(indent, 1, -5) .. "}\n")
 		end
 		function tap.draw()
 			print("-- ready")
-			print_r(sipcalls)
+			print_j(sipcalls)
 			print("-- done")
 		end
 		function tap.reset()
