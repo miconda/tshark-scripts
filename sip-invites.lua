@@ -45,27 +45,35 @@ do
 			indent = indent or '    '
 			io.write("{\n")
 			local l = 0
+			local t = 0
 			for k, v in pairs(tbl) do
 				if l == 1 then
 					io.write(",\n")
 				end
-				io.write(indent .. "\"" .. k .. "\": ")
+				io.write(indent .. string.format("%q", k) .. ": ")
 				if type(v) == "table" then
 					print_j(v, indent .. '    ')
+					io.write("\n")
+					t = 1
 				else
 					if type(v) == "number" then
 						io.write(tostring(v))
 					else
-						io.write("\"" .. tostring(v) .. "\"")
+						io.write(string.format("%q", tostring(v)))
 					end
+					t = 0
 				end
 				l = 1
 			end
-			io.write("\n" .. string.sub(indent, 1, -5) .. "}\n")
+			if t == 0 then
+				io.write("\n")
+			end
+			io.write(string.sub(indent, 1, -5) .. "}")
 		end
 		function tap.draw()
 			print("-- ready")
 			print_j(sipcalls)
+			print()
 			print("-- done")
 		end
 		function tap.reset()
