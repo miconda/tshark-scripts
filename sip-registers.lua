@@ -3,7 +3,10 @@
 -- * details for last response sent to the origin of the REGISTER
 -- * the key is 'Call-Id::CSeq-Number'
 
-print("-- starting")
+debug = tonumber(os.getenv('DEBUG') or "0")
+if debug == 1 then
+	print("-- starting")
+end
 
 do
 	sipregs = {}
@@ -85,13 +88,19 @@ do
 			io.write(string.sub(indent, 1, -5) .. "}")
 		end
 		function tap.draw()
-			print("-- ready")
+			if debug == 1 then
+				print("-- ready")
+			end
 			print_j(sipregs)
 			print()
-			print("-- done")
+			if debug == 1 then
+				print("-- done")
+			end
 		end
 		function tap.reset()
-			print("-- finished")
+			if debug == 1 then
+				print("-- finished")
+			end
 		end
 	end
 	register_listener()
