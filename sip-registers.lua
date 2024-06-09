@@ -55,16 +55,18 @@ do
 			indent = indent or '    '
 			io.write("{\n")
 			local l = 0
-			local t = 0
-			for k, v in pairs(tbl) do
-				if l == 1 then
-					io.write(",\n")
-				end
+			local n = 0
+			local skeys = {}
+			for k in pairs(tbl) do
+				table.insert(skeys, k)
+				n = n + 1
+			end
+			table.sort(skeys)
+			for _, k in pairs(skeys) do
+				v = tbl[k]
 				io.write(indent .. string.format("%q", k) .. ": ")
 				if type(v) == "table" then
 					print_j(v, indent .. '    ')
-					io.write("\n")
-					t = 1
 				else
 					if type(v) == "number" then
 						io.write(tostring(v))
@@ -73,10 +75,12 @@ do
 					end
 					t = 0
 				end
-				l = 1
-			end
-			if t == 0 then
-				io.write("\n")
+				l = l + 1
+				if l == n then
+					io.write("\n")
+				else
+					io.write(",\n")
+				end
 			end
 			io.write(string.sub(indent, 1, -5) .. "}")
 		end
