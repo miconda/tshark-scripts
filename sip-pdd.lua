@@ -13,6 +13,7 @@ do
 	local sip_status_code_f = Field.new("sip.Status-Code")
 	local sip_call_id_f = Field.new("sip.Call-ID")
 	local sip_cseq_method_f = Field.new("sip.CSeq.method")
+	local sip_cseq_number_f = Field.new("sip.CSeq.seq")
 
 	local function register_listener()
 		local tap = Listener.new(nil, "(sip.CSeq.method == INVITE)")
@@ -21,6 +22,7 @@ do
 			local sip_status_code = tostring(sip_status_code_f() or "none")
 			local sip_call_id = tostring(sip_call_id_f())
 			local sip_cseq_method = tostring(sip_cseq_method_f())
+			local sip_cseq_number = tostring(sip_cseq_number_f())
 			local src_addr = tostring(pinfo.src) .. ":" .. tostring(pinfo.src_port)
 			local dst_addr = tostring(pinfo.dst) .. ":" .. tostring(pinfo.dst_port)
 
@@ -29,34 +31,36 @@ do
 				print("        request-line: " .. sip_request_line)
 				print("        status-code: " .. sip_status_code)
 				print("        method: " .. sip_cseq_method)
+				print("        cseq-number: " .. sip_cseq_number)
 				print("        time: " .. tostring(pinfo.abs_ts))
 				print("        src-addr: " .. src_addr)
 				print("        dst-addr: " .. dst_addr)
 				print("^^^^^^^ call-id: " .. sip_call_id)
 			end
 
+			local invkey = sip_call_id .. "::" .. sip_cseq_number
 			if sip_request_line ~= "none" then
-				if sipcalls[sip_call_id] == nil then
-					sipcalls[sip_call_id] = {}
+				if sipcalls[invkey] == nil then
+					sipcalls[invkey] = {}
 				end
-				if sipcalls[sip_call_id]["INVITE_FRAMENO"] == nil then
-					sipcalls[sip_call_id]["INVITE_FRAMENO"] = pinfo.number
-					sipcalls[sip_call_id]["INVITE_TIME"] = pinfo.abs_ts
-					sipcalls[sip_call_id]["INVITE_SRC"] = src_addr
-					sipcalls[sip_call_id]["INVITE_DST"] = dst_addr
+				if sipcalls[invkey]["INVITE_FRAMENO"] == nil then
+					sipcalls[invkey]["INVITE_FRAMENO"] = pinfo.number
+					sipcalls[invkey]["INVITE_TIME"] = pinfo.abs_ts
+					sipcalls[invkey]["INVITE_SRC"] = src_addr
+					sipcalls[invkey]["INVITE_DST"] = dst_addr
 				end
 			end
-			if sip_status_code == "180" and sipcalls[sip_call_id] ~= nil then
-				sipcalls[sip_call_id]["R180_FRAMENO"] = pinfo.number
-				sipcalls[sip_call_id]["R180_TIME"] = pinfo.abs_ts
-				sipcalls[sip_call_id]["R180_SRC"] = src_addr
-				sipcalls[sip_call_id]["R180_DST"] = dst_addr
+			if sip_status_code == "180" and sipcalls[invkey] ~= nil then
+				sipcalls[invkey]["R180_FRAMENO"] = pinfo.number
+				sipcalls[invkey]["R180_TIME"] = pinfo.abs_ts
+				sipcalls[invkey]["R180_SRC"] = src_addr
+				sipcalls[invkey]["R180_DST"] = dst_addr
 			end
-			if sip_status_code == "183" and sipcalls[sip_call_id] ~= nil then
-				sipcalls[sip_call_id]["R183_FRAMENO"] = pinfo.number
-				sipcalls[sip_call_id]["R183_TIME"] = pinfo.abs_ts
-				sipcalls[sip_call_id]["R183_SRC"] = src_addr
-				sipcalls[sip_call_id]["R183_DST"] = dst_addr
+			if sip_status_code == "183" and sipcalls[invkey] ~= nil then
+				sipcalls[invkey]["R183_FRAMENO"] = pinfo.number
+				sipcalls[invkey]["R183_TIME"] = pinfo.abs_ts
+				sipcalls[invkey]["R183_SRC"] = src_addr
+				sipcalls[invkey]["R183_DST"] = dst_addr
 			end
 		end
 		function print_r (t, indent, done)
