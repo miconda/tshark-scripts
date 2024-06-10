@@ -50,19 +50,19 @@ do
 					sipcalls[invkey]["INVITE_DST"] = dst_addr
 				end
 			end
-			if sip_status_code == "180" and sipcalls[invkey] ~= nil
+			if sip_status_code ~= "none" and sipcalls[invkey] ~= nil
 					and sipcalls[invkey]["INVITE_SRC"] == dst_addr then
-				sipcalls[invkey]["R180_FRAMENO"] = pinfo.number
-				sipcalls[invkey]["R180_TIME"] = pinfo.abs_ts
-				sipcalls[invkey]["R180_SRC"] = src_addr
-				sipcalls[invkey]["R180_DST"] = dst_addr
-			end
-			if sip_status_code == "183" and sipcalls[invkey] ~= nil
-					and sipcalls[invkey]["INVITE_SRC"] == dst_addr then
-				sipcalls[invkey]["R183_FRAMENO"] = pinfo.number
-				sipcalls[invkey]["R183_TIME"] = pinfo.abs_ts
-				sipcalls[invkey]["R183_SRC"] = src_addr
-				sipcalls[invkey]["R183_DST"] = dst_addr
+				local rkey = "R" .. sip_status_code
+				if sipcalls[invkey][rkey .. "F_FRAMENO"] == nil then
+					sipcalls[invkey][rkey .. "F_FRAMENO"] = pinfo.number
+					sipcalls[invkey][rkey .. "F_TIME"] = pinfo.abs_ts
+					sipcalls[invkey][rkey .. "F_SRC"] = src_addr
+					sipcalls[invkey][rkey .. "F_DST"] = dst_addr
+				end
+				sipcalls[invkey][rkey .. "L_FRAMENO"] = pinfo.number
+				sipcalls[invkey][rkey .. "L_TIME"] = pinfo.abs_ts
+				sipcalls[invkey][rkey .. "L_SRC"] = src_addr
+				sipcalls[invkey][rkey .. "L_DST"] = dst_addr
 			end
 		end
 		function print_j(tbl, indent)
@@ -109,11 +109,21 @@ do
 			if debug == 1 then
 				print("-- processing")
 			end
+			rplcodes = {"100", "180", "183", "200"}
 			for k,v in pairs(sipcalls) do
-				pdd180 = tonumber(string.format("%.4f", sipcalls[k]["R180_TIME"] - sipcalls[k]["INVITE_TIME"]))
-				pdd183 = tonumber(string.format("%.4f", sipcalls[k]["R183_TIME"] - sipcalls[k]["INVITE_TIME"]))
-				print("-- pdd180[" .. k .. "] = " .. tostring(pdd180))
-				print("-- pdd183[" .. k .. "] = " .. tostring(pdd183))
+				for _, r in pairs(rplcodes) do
+					rkey = "R" .. r
+					if sipcalls[k][rkey .. "F_TIME"] ~= nil then
+						pdd = tonumber(string.format("%.4f", sipcalls[k][rkey .. "F_TIME"] -
+								sipcalls[k]["INVITE_TIME"]))
+						print("-- PDD" .. r .."F[" .. k .. "] = " .. tostring(pdd))
+					end
+					if sipcalls[k][rkey .. "L_TIME"] ~= nil then
+						pdd = tonumber(string.format("%.4f", sipcalls[k][rkey .. "L_TIME"] -
+								sipcalls[k]["INVITE_TIME"]))
+						print("-- PDD" .. r .."L[" .. k .. "] = " .. tostring(pdd))
+					end
+				end
 			end
 			if debug == 1 then
 				print("-- done")
