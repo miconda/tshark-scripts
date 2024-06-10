@@ -63,31 +63,46 @@ do
 				sipcalls[invkey]["R183_DST"] = dst_addr
 			end
 		end
-		function print_r (t, indent, done)
-			done = done or {}
-			indent = indent or ''
-			local nextIndent -- Storage for next indentation value
-			for key, value in pairs (t) do
-				if type (value) == "table" and not done [value] then
-					nextIndent = nextIndent or
-					(indent .. string.rep(' ',string.len(tostring (key))+2))
-					-- Shortcut conditional allocation
-					done [value] = true
-					print (indent .. "[" .. tostring (key) .. "] => Table {");
-					print  (nextIndent .. "{");
-					print_r (value, nextIndent .. string.rep(' ',2), done)
-					print  (nextIndent .. "}");
+		function print_j(tbl, indent)
+			indent = indent or '    '
+			io.write("{\n")
+			local l = 0
+			local n = 0
+			local skeys = {}
+			for k in pairs(tbl) do
+				table.insert(skeys, k)
+				n = n + 1
+			end
+			table.sort(skeys)
+			for _, k in pairs(skeys) do
+				v = tbl[k]
+				io.write(indent .. string.format("%q", k) .. ": ")
+				if type(v) == "table" then
+					print_j(v, indent .. '    ')
 				else
-					print  (indent .. "[" .. tostring (key) .. "] => " .. tostring (value).."")
+					if type(v) == "number" then
+						io.write(tostring(v))
+					else
+						io.write(string.format("%q", tostring(v)))
+					end
+					t = 0
+				end
+				l = l + 1
+				if l == n then
+					io.write("\n")
+				else
+					io.write(",\n")
 				end
 			end
+			io.write(string.sub(indent, 1, -5) .. "}")
 		end
 		function tap.draw()
 			if debug == 1 then
 				print("-- ready")
 			end
 			if debug == 1 then
-				print_r(sipcalls)
+				print_j(sipcalls)
+				print()
 			end
 			if debug == 1 then
 				print("-- processing")
