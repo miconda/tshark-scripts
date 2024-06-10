@@ -50,13 +50,15 @@ do
 					sipcalls[invkey]["INVITE_DST"] = dst_addr
 				end
 			end
-			if sip_status_code == "180" and sipcalls[invkey] ~= nil then
+			if sip_status_code == "180" and sipcalls[invkey] ~= nil
+					and sipcalls[invkey]["INVITE_SRC"] == dst_addr then
 				sipcalls[invkey]["R180_FRAMENO"] = pinfo.number
 				sipcalls[invkey]["R180_TIME"] = pinfo.abs_ts
 				sipcalls[invkey]["R180_SRC"] = src_addr
 				sipcalls[invkey]["R180_DST"] = dst_addr
 			end
-			if sip_status_code == "183" and sipcalls[invkey] ~= nil then
+			if sip_status_code == "183" and sipcalls[invkey] ~= nil
+					and sipcalls[invkey]["INVITE_SRC"] == dst_addr then
 				sipcalls[invkey]["R183_FRAMENO"] = pinfo.number
 				sipcalls[invkey]["R183_TIME"] = pinfo.abs_ts
 				sipcalls[invkey]["R183_SRC"] = src_addr
