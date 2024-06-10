@@ -109,22 +109,26 @@ do
 			if debug == 1 then
 				print("-- processing")
 			end
-			rplcodes = {"100", "180", "183", "200"}
+			local pddtbl = {}
+			local rplcodes = {"100", "180", "183", "200"}
 			for k,v in pairs(sipcalls) do
+				pddtbl[k] = {}
 				for _, r in pairs(rplcodes) do
-					rkey = "R" .. r
+					local rkey = "R" .. r
 					if sipcalls[k][rkey .. "F_TIME"] ~= nil then
 						pdd = tonumber(string.format("%.4f", sipcalls[k][rkey .. "F_TIME"] -
 								sipcalls[k]["INVITE_TIME"]))
-						print("-- PDD" .. r .."F[" .. k .. "] = " .. tostring(pdd))
+						pddtbl[k]["PDD" .. r .."F"] = pdd
 					end
 					if sipcalls[k][rkey .. "L_TIME"] ~= nil then
 						pdd = tonumber(string.format("%.4f", sipcalls[k][rkey .. "L_TIME"] -
 								sipcalls[k]["INVITE_TIME"]))
-						print("-- PDD" .. r .."L[" .. k .. "] = " .. tostring(pdd))
+						pddtbl[k]["PDD" .. r .."L"] = pdd
 					end
 				end
 			end
+			print_j(pddtbl)
+			print()
 			if debug == 1 then
 				print("-- done")
 			end
