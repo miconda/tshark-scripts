@@ -1,6 +1,8 @@
 -- List post dial delay (PDD) for INVITE transactions
--- * betweend first received INVITE and last sent 180
--- * betweend first received INVITE and last sent 183
+-- * betweend first received INVITE and first/last sent 100
+-- * betweend first received INVITE and first/last sent 180
+-- * betweend first received INVITE and first/last sent 183
+-- * betweend first received INVITE and lfirst/ast sent 200
 
 debug = tonumber(os.getenv('DEBUG') or "0")
 if debug == 1 then
@@ -28,6 +30,7 @@ do
 
 			if debug == 1 then
 				print("======= call-id: " .. sip_call_id)
+				print("        frame-number: " .. tostring(pinfo.number))
 				print("        request-line: " .. sip_request_line)
 				print("        status-code: " .. sip_status_code)
 				print("        method: " .. sip_cseq_method)
