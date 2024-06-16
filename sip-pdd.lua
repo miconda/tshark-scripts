@@ -28,7 +28,7 @@ do
 			local src_addr = tostring(pinfo.src) .. ":" .. tostring(pinfo.src_port)
 			local dst_addr = tostring(pinfo.dst) .. ":" .. tostring(pinfo.dst_port)
 
-			if debug == 1 then
+			if debug > 1 then
 				print("======= call-id: " .. sip_call_id)
 				print("        frame-number: " .. tostring(pinfo.number))
 				print("        request-line: " .. sip_request_line)
@@ -102,14 +102,14 @@ do
 			io.write(string.sub(indent, 1, -5) .. "}")
 		end
 		function tap.draw()
-			if debug == 1 then
+			if debug >= 1 then
 				print("-- ready")
 			end
-			if debug == 1 then
+			if debug >= 1 then
 				print_j(sipcalls)
 				print()
 			end
-			if debug == 1 then
+			if debug >= 1 then
 				print("-- processing")
 			end
 			local pddtbl = {}
@@ -132,12 +132,12 @@ do
 			end
 			print_j(pddtbl)
 			print()
-			if debug == 1 then
+			if debug >= 1 then
 				print("-- done")
 			end
 		end
 		function tap.reset()
-			if debug == 1 then
+			if debug >= 1 then
 				print("-- finished")
 			end
 		end
