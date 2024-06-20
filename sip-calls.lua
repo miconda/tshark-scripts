@@ -13,6 +13,8 @@ do
 	local sip_call_id_f = Field.new("sip.Call-ID")
 	local sip_cseq_method_f = Field.new("sip.CSeq.method")
 	local sip_cseq_number_f = Field.new("sip.CSeq.seq")
+	local sip_from_tag_f = Field.new("sip.from.tag")
+	local sip_to_tag_f = Field.new("sip.to.tag")
 
 	local function register_listener()
 		local tap = Listener.new(nil, "(sip.CSeq.method == INVITE) || (sip.CSeq.method == BYE)")
@@ -22,6 +24,8 @@ do
 			local sip_call_id = tostring(sip_call_id_f())
 			local sip_cseq_method = tostring(sip_cseq_method_f())
 			local sip_cseq_number = tostring(sip_cseq_number_f())
+			local sip_from_tag = tostring(sip_from_tag_f() or "none")
+			local sip_to_tag = tostring(sip_to_tag_f() or "none")
 			local src_addr = tostring(pinfo.src) .. ":" .. tostring(pinfo.src_port)
 			local dst_addr = tostring(pinfo.dst) .. ":" .. tostring(pinfo.dst_port)
 
@@ -47,6 +51,8 @@ do
 				if sipmsgs[msgkey][rkey .. "_FRAMENO"] == nil then
 					sipmsgs[msgkey][rkey .. "_FRAMENO"] = pinfo.number
 					sipmsgs[msgkey][rkey .. "_TIME"] = pinfo.abs_ts
+					sipmsgs[msgkey][rkey .. "_FROMTAG"] = sip_from_tag
+					sipmsgs[msgkey][rkey .. "_TOTAG"] = sip_to_tag
 					sipmsgs[msgkey][rkey .. "_SRC"] = src_addr
 					sipmsgs[msgkey][rkey .. "_DST"] = dst_addr
 				end
@@ -57,11 +63,15 @@ do
 				if sipmsgs[msgkey][rkey .. "F_FRAMENO"] == nil then
 					sipmsgs[msgkey][rkey .. "F_FRAMENO"] = pinfo.number
 					sipmsgs[msgkey][rkey .. "F_TIME"] = pinfo.abs_ts
+					sipmsgs[msgkey][rkey .. "F_FROMTAG"] = sip_from_tag
+					sipmsgs[msgkey][rkey .. "F_TOTAG"] = sip_to_tag
 					sipmsgs[msgkey][rkey .. "F_SRC"] = src_addr
 					sipmsgs[msgkey][rkey .. "F_DST"] = dst_addr
 				end
 				sipmsgs[msgkey][rkey .. "L_FRAMENO"] = pinfo.number
 				sipmsgs[msgkey][rkey .. "L_TIME"] = pinfo.abs_ts
+				sipmsgs[msgkey][rkey .. "L_FROMTAG"] = sip_from_tag
+				sipmsgs[msgkey][rkey .. "L_TOTAG"] = sip_to_tag
 				sipmsgs[msgkey][rkey .. "L_SRC"] = src_addr
 				sipmsgs[msgkey][rkey .. "L_DST"] = dst_addr
 			end
@@ -112,7 +122,7 @@ do
 			end
 			local pddtbl = {}
 			local rplcodes = {"100", "180", "183", "200"}
-			for k,v in pairs(sipmsgs) do
+			for k,_ in pairs(sipmsgs) do
 				pddtbl[k] = {}
 				for _, r in pairs(rplcodes) do
 					local qkey = "INVITE"
