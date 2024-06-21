@@ -9,22 +9,28 @@ do
 	sipcalls = {}
 	sipmsgs = {}
 	local sip_request_line_f = Field.new("sip.Request-Line")
+	local sip_ruri_f = Field.new("sip.r-uri")
 	local sip_status_code_f = Field.new("sip.Status-Code")
 	local sip_call_id_f = Field.new("sip.Call-ID")
 	local sip_cseq_method_f = Field.new("sip.CSeq.method")
 	local sip_cseq_number_f = Field.new("sip.CSeq.seq")
+	local sip_from_addr_f = Field.new("sip.from.addr")
 	local sip_from_tag_f = Field.new("sip.from.tag")
+	local sip_to_addr_f = Field.new("sip.to.addr")
 	local sip_to_tag_f = Field.new("sip.to.tag")
 
 	local function register_listener()
 		local tap = Listener.new(nil, "(sip.CSeq.method == INVITE) || (sip.CSeq.method == BYE)")
 		function tap.packet(pinfo, tvb, tapinfo)
 			local sip_request_line = tostring(sip_request_line_f() or "none")
+			local sip_ruri = tostring(sip_ruri_f() or "none")
 			local sip_status_code = tostring(sip_status_code_f() or "none")
 			local sip_call_id = tostring(sip_call_id_f())
 			local sip_cseq_method = tostring(sip_cseq_method_f())
 			local sip_cseq_number = tostring(sip_cseq_number_f())
+			local sip_from_addr = tostring(sip_from_addr_f() or "none")
 			local sip_from_tag = tostring(sip_from_tag_f() or "none")
+			local sip_to_addr = tostring(sip_to_addr_f() or "none")
 			local sip_to_tag = tostring(sip_to_tag_f() or "none")
 			local src_addr = tostring(pinfo.src) .. ":" .. tostring(pinfo.src_port)
 			local dst_addr = tostring(pinfo.dst) .. ":" .. tostring(pinfo.dst_port)
@@ -51,8 +57,11 @@ do
 				if sipmsgs[msgkey][rkey .. "_FRAMENO"] == nil then
 					sipmsgs[msgkey][rkey .. "_FRAMENO"] = pinfo.number
 					sipmsgs[msgkey][rkey .. "_TIME"] = pinfo.abs_ts
+					sipmsgs[msgkey][rkey .. "_RURI"] = sip_ruri
 					sipmsgs[msgkey][rkey .. "_CALLID"] = sip_call_id
+					sipmsgs[msgkey][rkey .. "_FROMADDR"] = sip_from_addr
 					sipmsgs[msgkey][rkey .. "_FROMTAG"] = sip_from_tag
+					sipmsgs[msgkey][rkey .. "_TOADDR"] = sip_to_addr
 					sipmsgs[msgkey][rkey .. "_TOTAG"] = sip_to_tag
 					sipmsgs[msgkey][rkey .. "_SRC"] = src_addr
 					sipmsgs[msgkey][rkey .. "_DST"] = dst_addr
@@ -129,7 +138,9 @@ do
 									sipmsgs[y]["R200F_TIME"] ~= nil then
 							sipcalls[y] = {}
 							sipcalls[y]["CALLID"] = sipmsgs[y]["INVITE_CALLID"]
+							sipcalls[y]["FROMADDR"] = sipmsgs[y]["INVITE_FROMADDR"]
 							sipcalls[y]["FROMTAG"] = sipmsgs[y]["INVITE_FROMTAG"]
+							sipcalls[y]["TOADDR"] = sipmsgs[y]["INVITE_TOADDR"]
 							sipcalls[y]["TOTAG"] = sipmsgs[y]["R200F_TOTAG"]
 							sipcalls[y]["TBEGIN"] = sipmsgs[y]["R200F_TIME"]
 							sipcalls[y]["TEND"] = sipmsgs[k]["BYE_TIME"]
