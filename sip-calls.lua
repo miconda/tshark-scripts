@@ -51,6 +51,7 @@ do
 				if sipmsgs[msgkey][rkey .. "_FRAMENO"] == nil then
 					sipmsgs[msgkey][rkey .. "_FRAMENO"] = pinfo.number
 					sipmsgs[msgkey][rkey .. "_TIME"] = pinfo.abs_ts
+					sipmsgs[msgkey][rkey .. "_CALLID"] = sip_call_id
 					sipmsgs[msgkey][rkey .. "_FROMTAG"] = sip_from_tag
 					sipmsgs[msgkey][rkey .. "_TOTAG"] = sip_to_tag
 					sipmsgs[msgkey][rkey .. "_SRC"] = src_addr
@@ -120,29 +121,25 @@ do
 			if debug >= 1 then
 				print("-- processing")
 			end
-			local pddtbl = {}
-			local rplcodes = {"100", "180", "183", "200"}
 			for k,_ in pairs(sipmsgs) do
-				pddtbl[k] = {}
-				for _, r in pairs(rplcodes) do
-					local qkey = "INVITE"
-					if sipmsgs[k]["BYE_FRAMENO"] ~= nil then
-						qkey = "BYE";
-					end
-					local rkey = "R" .. r
-					if sipmsgs[k][rkey .. "F_TIME"] ~= nil then
-						pdd = tonumber(string.format("%.4f", sipmsgs[k][rkey .. "F_TIME"] -
-								sipmsgs[k][qkey .. "_TIME"]))
-						pddtbl[k]["PDD" .. r .."F"] = pdd
-					end
-					if sipmsgs[k][rkey .. "L_TIME"] ~= nil then
-						pdd = tonumber(string.format("%.4f", sipmsgs[k][rkey .. "L_TIME"] -
-								sipmsgs[k][qkey .. "_TIME"]))
-						pddtbl[k]["PDD" .. r .."L"] = pdd
+				if sipmsgs[k]["BYE_FRAMENO"] ~= nil then
+					for y, _ in pairs(sipmsgs) do
+						if sipmsgs[y]["INVITE_FRAMENO"] ~= nil and sipmsgs[y]["INVITE_TOTAG"] == "none" and
+									sipmsgs[y]["INVITE_CALLID"] == sipmsgs[k]["BYE_CALLID"] and
+									sipmsgs[y]["R200F_TIME"] ~= nil then
+							sipcalls[y] = {}
+							sipcalls[y]["CALLID"] = sipmsgs[y]["INVITE_CALLID"]
+							sipcalls[y]["FROMTAG"] = sipmsgs[y]["INVITE_FROMTAG"]
+							sipcalls[y]["TOTAG"] = sipmsgs[y]["R200F_TOTAG"]
+							sipcalls[y]["TBEGIN"] = sipmsgs[y]["R200F_TIME"]
+							sipcalls[y]["TEND"] = sipmsgs[k]["BYE_TIME"]
+							sipcalls[y]["DURATION"] = tonumber(string.format("%.4f", sipmsgs[k]["BYE_TIME"] -
+									sipmsgs[y]["R200F_TIME"]))
+						end
 					end
 				end
 			end
-			print_j(pddtbl)
+			print_j(sipcalls)
 			print()
 			if debug >= 1 then
 				print("-- done")
