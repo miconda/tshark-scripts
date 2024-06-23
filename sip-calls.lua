@@ -137,11 +137,13 @@ do
 									sipmsgs[y]["INVITE_CALLID"] == sipmsgs[k]["BYE_CALLID"] and
 									sipmsgs[y]["R200F_TIME"] ~= nil then
 							sipcalls[y] = {}
+							sipcalls[y]["FRAMENOINV"] = sipmsgs[y]["INVITE_FRAMENO"]
 							sipcalls[y]["CALLID"] = sipmsgs[y]["INVITE_CALLID"]
 							sipcalls[y]["FROMADDR"] = sipmsgs[y]["INVITE_FROMADDR"]
 							sipcalls[y]["FROMTAG"] = sipmsgs[y]["INVITE_FROMTAG"]
 							sipcalls[y]["TOADDR"] = sipmsgs[y]["INVITE_TOADDR"]
 							sipcalls[y]["TOTAG"] = sipmsgs[y]["R200F_TOTAG"]
+							sipcalls[y]["FRAMENOBYE"] = sipmsgs[k]["BYE_FRAMENO"]
 							sipcalls[y]["TBEGIN"] = sipmsgs[y]["R200F_TIME"]
 							sipcalls[y]["TEND"] = sipmsgs[k]["BYE_TIME"]
 							sipcalls[y]["DURATION"] = tonumber(string.format("%.4f", sipmsgs[k]["BYE_TIME"] -
