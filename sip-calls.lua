@@ -144,8 +144,9 @@ do
 							sipcalls[y]["TOADDR"] = sipmsgs[y]["INVITE_TOADDR"]
 							sipcalls[y]["TOTAG"] = sipmsgs[y]["R200F_TOTAG"]
 							sipcalls[y]["FRAMENOBYE"] = sipmsgs[k]["BYE_FRAMENO"]
-							sipcalls[y]["TBEGIN"] = sipmsgs[y]["R200F_TIME"]
-							sipcalls[y]["TEND"] = sipmsgs[k]["BYE_TIME"]
+							sipcalls[y]["TSBEGIN"] = sipmsgs[y]["R200F_TIME"]
+							sipcalls[y]["DTBEGIN"] = tostring(os.date('%Y-%m-%d %H:%M:%S', sipmsgs[y]["R200F_TIME"]))
+							sipcalls[y]["TSEND"] = sipmsgs[k]["BYE_TIME"]
 							sipcalls[y]["DURATION"] = tonumber(string.format("%.4f", sipmsgs[k]["BYE_TIME"] -
 									sipmsgs[y]["R200F_TIME"]))
 						end
