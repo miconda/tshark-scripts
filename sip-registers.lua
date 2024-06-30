@@ -39,6 +39,7 @@ do
 				if sipregs[regkey]["REGISTER_FRAMENO"] == nil then
 					sipregs[regkey]["REGISTER_FRAMENO"] = pinfo.number
 					sipregs[regkey]["REGISTER_TIME"] = pinfo.abs_ts
+					sipregs[regkey]["REGISTER_DATE"] = tostring(os.date('%Y-%m-%d %H:%M:%S', sipregs[regkey]["REGISTER_TIME"]))
 					sipregs[regkey]["REGISTER_SRC"] = src_addr
 					sipregs[regkey]["REGISTER_DST"] = dst_addr
 					sipregs[regkey]["REGISTER_EXPIRES"] = sip_expires
