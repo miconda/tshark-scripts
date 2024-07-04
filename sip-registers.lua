@@ -13,10 +13,10 @@ do
 	local sip_request_line_f = Field.new("sip.Request-Line")
 	local sip_status_code_f = Field.new("sip.Status-Code")
 	local sip_call_id_f = Field.new("sip.Call-ID")
-	local sip_cseq_method_f = Field.new("sip.CSeq.method")
 	local sip_cseq_number_f = Field.new("sip.CSeq.seq")
 	local sip_expires_f = Field.new("sip.Expires")
 	local sip_to_user_f = Field.new("sip.to.user")
+	local sip_user_agent_id_f = Field.new("sip.User-Agent")
 
 	local function register_listener()
 		local tap = Listener.new(nil, "(sip.CSeq.method == REGISTER)")
@@ -24,7 +24,7 @@ do
 			local sip_request_line = tostring(sip_request_line_f() or "none")
 			local sip_status_code = tostring(sip_status_code_f() or "none")
 			local sip_call_id = tostring(sip_call_id_f())
-			local sip_cseq_method = tostring(sip_cseq_method_f())
+			local sip_user_agent = tostring(sip_user_agent_f())
 			local src_addr = tostring(pinfo.src) .. ":" .. tostring(pinfo.src_port)
 			local dst_addr = tostring(pinfo.dst) .. ":" .. tostring(pinfo.dst_port)
 			local sip_cseq_number = tostring(sip_cseq_number_f())
@@ -44,6 +44,7 @@ do
 					sipregs[regkey]["REGISTER_DST"] = dst_addr
 					sipregs[regkey]["REGISTER_EXPIRES"] = sip_expires
 					sipregs[regkey]["REGISTER_TOUSER"] = sip_to_user
+					sipregs[regkey]["REGISTER_USERAGENT"] = sip_user_agent
 				end
 			end
 			if sip_status_code ~= "none" and sipregs[regkey] ~= nil
