@@ -16,7 +16,7 @@ do
 	local sip_cseq_number_f = Field.new("sip.CSeq.seq")
 	local sip_expires_f = Field.new("sip.Expires")
 	local sip_to_user_f = Field.new("sip.to.user")
-	local sip_user_agent_id_f = Field.new("sip.User-Agent")
+	local sip_user_agent_f = Field.new("sip.User-Agent")
 
 	local function register_listener()
 		local tap = Listener.new(nil, "(sip.CSeq.method == REGISTER)")
