@@ -2,7 +2,7 @@
 -- * betweend first received INVITE and first/last sent 100
 -- * betweend first received INVITE and first/last sent 180
 -- * betweend first received INVITE and first/last sent 183
--- * betweend first received INVITE and lfirst/ast sent 200
+-- * betweend first received INVITE and first/last sent 200
 
 debug = tonumber(os.getenv('DEBUG') or "0")
 if debug == 1 then
